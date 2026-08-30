@@ -1,4 +1,4 @@
-# 先搞懂：GitHub 不是「上線網站」
+# 如何讓 Google AI Studio APP 在 GitHub 上運行
 
 這個流程只有四件事：
 
