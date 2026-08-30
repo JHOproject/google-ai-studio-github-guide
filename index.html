@@ -42,6 +42,40 @@
     th { background: #f6f8fa; }
     blockquote { margin: 16px 0; padding: 4px 16px; color: var(--muted); border-left: 4px solid var(--border); }
     blockquote p { margin: 8px 0; }
+    .copy-prompt {
+      margin: 16px 0;
+      overflow: hidden;
+      background: #fbfcfe;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .copy-prompt__toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 12px;
+      background: #f6f8fa;
+      border-bottom: 1px solid var(--border);
+    }
+    .copy-prompt__label { color: var(--muted); font-size: 14px; font-weight: 600; }
+    .copy-prompt__button {
+      min-height: 38px;
+      padding: 7px 14px;
+      color: #ffffff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--link);
+      border: 1px solid var(--link);
+      border-radius: 7px;
+    }
+    .copy-prompt__button:hover { background: #0550ae; }
+    .copy-prompt__button:focus-visible { outline: 3px solid rgba(9, 105, 218, 0.3); outline-offset: 2px; }
+    .copy-prompt__button:disabled { cursor: default; opacity: 0.8; }
+    .copy-prompt blockquote { margin: 0; padding: 12px 18px; border-left: 0; }
+    .copy-prompt__status { min-height: 1.75em; margin: 0; padding: 0 18px 10px; color: var(--muted); font-size: 14px; }
     hr { height: 1px; margin: 32px 0; border: 0; background: var(--border); }
     @media (max-width: 640px) {
       main { width: 100%; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
@@ -127,7 +161,12 @@ GitHub。<br />
 </tbody>
 </table><h1>步驟 3｜只做一次：請 AI Studio 建立 GitHub Pages CI/CD</h1>
 <p>回到 Google AI Studio App，在 Prompt 輸入以下完整指示：</p>
-<blockquote>
+<div class="copy-prompt">
+<div class="copy-prompt__toolbar">
+<span class="copy-prompt__label">Google AI Studio Prompt</span>
+<button class="copy-prompt__button" id="copy-prompt-button" type="button" aria-describedby="copy-prompt-status">一鍵複製</button>
+</div>
+<blockquote id="deployment-prompt">
 <p>「請先檢查目前 App 是否適合部署到 GitHub Pages。GitHub Pages 只能提供靜態檔案；如果 App 依賴 Node.js 後端、伺服器端 API、Secrets、資料庫或其他無法在瀏覽器安全執行的功能，請先停止，不要把任何金鑰移到前端，並告訴我不適合的原因。</p>
 <p>如果適合，請依目前專案實際使用的框架與套件管理工具，完成 GitHub Pages 自動部署設定：</p>
 <ol>
@@ -138,6 +177,8 @@ GitHub。<br />
 <li>完成後再次執行 build，確認成功，並列出你新增或修改的檔案。不要把 API Key、密碼或 Token 寫入任何檔案。」</li>
 </ol>
 </blockquote>
+<p class="copy-prompt__status" id="copy-prompt-status" role="status" aria-live="polite"></p>
+</div>
 <p>AI Studio 完成後，打開 Code 確認能看到 <code>.github/workflows/deploy-pages.yml</code>，再按 GitHub 圖示裡的 <strong>Push changes</strong>（如果介面顯示 <strong>Publish to GitHub</strong>，則使用該按鈕），把這些變更推送到 GitHub 的 <code>main</code> branch。</p>
 <table>
 <thead>
@@ -264,5 +305,47 @@ account</u></a></p>
 <p>文件依 2026-08-30 可取得的官方資訊製作。Google AI Studio 與 GitHub
 介面可能隨更新略有變動。</p>
   </main>
+  <script>
+    const copyButton = document.getElementById('copy-prompt-button');
+    const promptContent = document.getElementById('deployment-prompt');
+    const copyStatus = document.getElementById('copy-prompt-status');
+
+    function copyWithFallback(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.setAttribute('readonly', '');
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      const copied = document.execCommand('copy');
+      textArea.remove();
+      if (!copied) throw new Error('Copy command failed');
+    }
+
+    copyButton.addEventListener('click', async () => {
+      const promptText = promptContent.innerText.trim();
+      copyButton.disabled = true;
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(promptText);
+        } else {
+          copyWithFallback(promptText);
+        }
+
+        copyButton.textContent = '已複製';
+        copyStatus.textContent = '完整 Prompt 已複製，可以直接貼到 Google AI Studio。';
+      } catch (error) {
+        copyButton.textContent = '複製失敗';
+        copyStatus.textContent = '瀏覽器無法自動複製，請手動選取 Prompt 內容。';
+      }
+
+      window.setTimeout(() => {
+        copyButton.disabled = false;
+        copyButton.textContent = '一鍵複製';
+      }, 2400);
+    });
+  </script>
 </body>
 </html>
