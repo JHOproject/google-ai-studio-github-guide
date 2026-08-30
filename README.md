@@ -139,29 +139,41 @@ GitHub 已經保存目前版本。接下來把 App 放到網路上。
 </tbody>
 </table>
 
-# 之後修改 App，要怎麼更新？
+# 之後修改 App，要怎麼自動部署更新？
 
-最簡單的記法：
+每次要更新網站時，優先在 Google AI Studio 的 Prompt 輸入：
+
+> 「請依照以下需求修改目前的 App：[在這裡寫要修改的內容]。修改完成後，請檢查是否有 build error；如果有，請直接修正，並確認目前版本可以部署。不要把 API Key、密碼或 Token 寫進程式碼。」
+
+AI Studio 完成修改後，先在右側預覽確認結果，再依照以下流程操作：
 
 <table>
 <colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>①<br />
-在 AI Studio Prompt 說明要修改什麼</th>
+在 AI Studio Prompt 輸入修改需求</th>
 <th>②<br />
-Push changes 到 GitHub</th>
+確認右側預覽與主要功能</th>
 <th>③<br />
-重新 Publish</th>
+Push changes 到 GitHub</th>
+<th>④<br />
+按 Publish → Publish App</th>
 </tr>
 </thead>
 <tbody>
 </tbody>
 </table>
+
+按下 **Publish App** 後，Google AI Studio 會自動開始部署目前版本。部署完成後，已發布的網站會更新；使用原本的公開網址重新整理，就可以看到新版內容，不需要每次建立新網址。
+
+| **請注意：自動部署是由 Publish App 觸發。只在 Prompt 完成修改或只 Push 到 GitHub，都不會自動更新已發布的 AI Studio 網站。每次要讓網站上線新版，都要再按一次 Publish App，並等待部署完成。** |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 | **GitHub 的用途是保留「程式碼版本」。它不會自動保存使用者在 App 裡輸入的資料。** |
 |----------------------------------------------------------------------------------|
@@ -204,5 +216,5 @@ apps</u>](https://ai.google.dev/gemini-api/docs/aistudio-build-mode)
 [<u>GitHub — Getting started with your
 account</u>](https://docs.github.com/en/get-started/onboarding/getting-started-with-your-github-account)
 
-文件依 2026-08-29 可取得的官方資訊製作。Google AI Studio 與 GitHub
+文件依 2026-08-30 可取得的官方資訊製作。Google AI Studio 與 GitHub
 介面可能隨更新略有變動。
