@@ -167,14 +167,14 @@ GitHub。<br />
 <button class="copy-prompt__button" id="copy-prompt-button" type="button" aria-describedby="copy-prompt-status">一鍵複製</button>
 </div>
 <blockquote id="deployment-prompt">
-<p>「請先檢查目前 App 是否適合部署到 GitHub Pages。GitHub Pages 只能提供靜態檔案；如果 App 依賴 Node.js 後端、伺服器端 API、Secrets、資料庫或其他無法在瀏覽器安全執行的功能，請先停止，不要把任何金鑰移到前端，並告訴我不適合的原因。</p>
+<p>請先檢查目前 App 是否適合部署到 GitHub Pages。GitHub Pages 只能提供靜態檔案；如果 App 依賴 Node.js 後端、伺服器端 API、Secrets、資料庫或其他無法在瀏覽器安全執行的功能，請先停止，不要把任何金鑰移到前端，並告訴我不適合的原因。</p>
 <p>如果適合，請依目前專案實際使用的框架與套件管理工具，完成 GitHub Pages 自動部署設定：</p>
 <ol>
 <li>確認正式 build 指令與輸出資料夾，並修正所有 build error。</li>
 <li>若框架需要，設定正確的 GitHub Pages base path：<code>/&lt;Repository 名稱&gt;/</code>。</li>
 <li>新建 <code>.github/workflows/deploy-pages.yml</code>。當程式碼 push 到 <code>main</code> 時，workflow 要安裝依賴、執行正式 build、上傳靜態產物，並使用 GitHub 官方 Pages Actions 部署；同時支援 <code>workflow_dispatch</code> 手動執行。</li>
 <li>Workflow 只給予必要權限：<code>contents: read</code>、<code>pages: write</code>、<code>id-token: write</code>，部署環境使用 <code>github-pages</code>。</li>
-<li>完成後再次執行 build，確認成功，並列出你新增或修改的檔案。不要把 API Key、密碼或 Token 寫入任何檔案。」</li>
+<li>完成後再次執行 build，確認成功，並列出你新增或修改的檔案。不要把 API Key、密碼或 Token 寫入任何檔案。</li>
 </ol>
 </blockquote>
 <p class="copy-prompt__status" id="copy-prompt-status" role="status" aria-live="polite"></p>
