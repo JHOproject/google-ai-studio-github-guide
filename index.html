@@ -67,13 +67,13 @@ Google AI Studio<br />
 </strong>做 App</th>
 <th><strong>2<br />
 GitHub<br />
-</strong>保存程式碼版本</th>
+</strong>同步程式碼版本</th>
 <th><strong>3<br />
-Publish<br />
-</strong>把 App 放到網路上</th>
+CI/CD<br />
+</strong>GitHub Actions 自動部署</th>
 <th><strong>4<br />
-網址<br />
-</strong>別人可以直接開</th>
+GitHub Pages<br />
+</strong>每次 Push 自動更新網站</th>
 </tr>
 </thead>
 <tbody>
@@ -81,13 +81,14 @@ Publish<br />
 </table><table>
 <thead>
 <tr>
-<th><strong>資安上最重要的觀念：GitHub 建議使用 Private（私人）Repository；API Key、密碼、Token 不要放進 GitHub。</strong></th>
+<th><strong>資安上最重要的觀念：API Key、密碼、Token 不要放進 GitHub，也不能寫進要由 GitHub Pages 公開的前端程式碼。</strong></th>
 </tr>
 </thead>
 </table>
 <h1>開始前，請先確認</h1>
 <blockquote>
 <p><strong>•</strong> 你已經有一個可以正常預覽的 Google AI Studio「網頁 App」專案。</p>
+<p><strong>•</strong> 這個 App 可以建置成靜態網站，不依賴 Node.js 後端、伺服器端 Secrets 或只能在伺服器執行的功能。如果不確定，步驟 3 會先請 AI Studio 檢查。</p>
 <p><strong>•</strong> 你可以登入 Google AI Studio 使用的 Google 帳號。</p>
 <p><strong>•</strong> 準備一個常用 Email，用來註冊 GitHub（如果還沒有 GitHub）。</p>
 </blockquote>
@@ -100,14 +101,13 @@ Publish<br />
 <p><strong>•</strong> 建議開啟兩步驟驗證（2FA），避免帳號只靠密碼保護。</p>
 </blockquote>
 <img src="./media/image1.png" style="width:6.9in;height:4.04143in" /><p>操作位置示意：按鈕名稱或位置可能因 Google AI Studio 更新略有不同。</p>
-<h1>步驟 2｜在 Google AI Studio 連動 GitHub，並建立 Private Repository</h1>
+<h1>步驟 2｜在 Google AI Studio 連動 GitHub，並建立 Repository</h1>
 <blockquote>
 <p><strong>• 回到你的 Google AI Studio App。</strong></p>
 <p><strong>• 點上方的 GitHub 圖示；如果找不到，也可以打開 Settings（設定）→
 GitHub。</strong></p>
 <p><strong>• 第一次使用時，按 Connect GitHub，依畫面登入並授權。</strong></p>
-<p><strong>• Repository name：輸入名稱，例如 my-ai-studio-app；Visibility：選
-Private。</strong></p>
+<p><strong>• Repository name：輸入名稱，例如 my-ai-studio-app。若使用 GitHub Free 並要公開 GitHub Pages，Visibility 選 Public；Private Repository 是否能使用 Pages，依 GitHub 方案而定。</strong></p>
 <p><strong>• 按 Create Git repo / Create new repository。AI Studio 會建立
 Repository，並把目前 App 程式碼同步到 GitHub。</strong></p>
 </blockquote>
@@ -125,29 +125,39 @@ GitHub。<br />
 </thead>
 <tbody>
 </tbody>
-</table><p><strong>上線前，先請 AI Studio 自己檢查一次</strong></p>
-<p>在 Prompt 輸入：「請檢查目前 App 是否有 build
-error；如果有，請直接修正，並確認目前版本可以部署。」</p>
-<h1>步驟 3｜正式上線，取得網址</h1>
-<p>GitHub 已經保存目前版本。接下來把 App 放到網路上。</p>
+</table><h1>步驟 3｜只做一次：請 AI Studio 建立 GitHub Pages CI/CD</h1>
+<p>回到 Google AI Studio App，在 Prompt 輸入以下完整指示：</p>
 <blockquote>
-<p><strong>•</strong> 回到 Google AI Studio App。</p>
-<p><strong>•</strong> 按右上角 Publish。</p>
-<p><strong>•</strong> 第一次使用如果看到 Get Started，先按 Get Started。</p>
-<p><strong>•</strong> Custom URL 可輸入想要的網址名稱；若名稱已被使用，就換一個。</p>
-<p><strong>•</strong> 按 Publish App。</p>
+<p>「請先檢查目前 App 是否適合部署到 GitHub Pages。GitHub Pages 只能提供靜態檔案；如果 App 依賴 Node.js 後端、伺服器端 API、Secrets、資料庫或其他無法在瀏覽器安全執行的功能，請先停止，不要把任何金鑰移到前端，並告訴我不適合的原因。</p>
+<p>如果適合，請依目前專案實際使用的框架與套件管理工具，完成 GitHub Pages 自動部署設定：</p>
+<ol>
+<li>確認正式 build 指令與輸出資料夾，並修正所有 build error。</li>
+<li>若框架需要，設定正確的 GitHub Pages base path：<code>/&lt;Repository 名稱&gt;/</code>。</li>
+<li>新建 <code>.github/workflows/deploy-pages.yml</code>。當程式碼 push 到 <code>main</code> 時，workflow 要安裝依賴、執行正式 build、上傳靜態產物，並使用 GitHub 官方 Pages Actions 部署；同時支援 <code>workflow_dispatch</code> 手動執行。</li>
+<li>Workflow 只給予必要權限：<code>contents: read</code>、<code>pages: write</code>、<code>id-token: write</code>，部署環境使用 <code>github-pages</code>。</li>
+<li>完成後再次執行 build，確認成功，並列出你新增或修改的檔案。不要把 API Key、密碼或 Token 寫入任何檔案。」</li>
+</ol>
 </blockquote>
-<img src="./media/image4.png" style="width:6.9in;height:4.04143in" /><p>操作位置示意：按鈕名稱或位置可能因 Google AI Studio 更新略有不同。</p>
+<p>AI Studio 完成後，打開 Code 確認能看到 <code>.github/workflows/deploy-pages.yml</code>，再按 GitHub 圖示裡的 <strong>Push changes</strong>（如果介面顯示 <strong>Publish to GitHub</strong>，則使用該按鈕），把這些變更推送到 GitHub 的 <code>main</code> branch。</p>
 <table>
 <thead>
 <tr>
-<th>發布時可能會使用 Google Cloud Run，並可能要求選擇 Google Cloud project 或設定計費。是否產生費用，會依實際使用量與帳號方案而定。</th>
+<th><strong><code>.yml</code> 必須實際同步到 GitHub 的 <code>.github/workflows/</code> 資料夾中；只留在 AI Studio、尚未 Push 到 GitHub 時，不會執行自動部署。</strong></th>
 </tr>
 </thead>
 </table>
-<h1>完成｜你會拿到一個網址</h1>
-<p>發布完成後，畫面會提供網址。把網址貼到新的瀏覽器分頁確認可以打開。</p>
-<img src="./media/image5.png" style="width:6.9in;height:4.04143in" /><p>操作位置示意：按鈕名稱或位置可能因 Google AI Studio 更新略有不同。</p>
+<h1>步驟 4｜只做一次：在 GitHub 開啟 Pages</h1>
+<p>前往剛才建立的 GitHub Repository：</p>
+<blockquote>
+<p><strong>•</strong> 點 <strong>Settings</strong>。</p>
+<p><strong>•</strong> 左側點 <strong>Pages</strong>。</p>
+<p><strong>•</strong> 在 <strong>Build and deployment → Source</strong> 選擇 <strong>GitHub Actions</strong>。</p>
+<p><strong>•</strong> 回到 <strong>Actions</strong> 頁面，打開剛才觸發的 workflow，等待 build 與 deploy 都顯示綠色勾勾。如果第一次執行發生在 Pages 開啟之前而失敗，請按 <strong>Run workflow</strong> 再執行一次。</p>
+</blockquote>
+<p>這項 Repository 管理設定通常需要 GitHub 管理員操作一次，不能只靠 AI Studio 在專案裡建立 <code>.yml</code> 完成。</p>
+<h1>完成｜取得 GitHub Pages 網址</h1>
+<p>部署成功後，在 <strong>Settings → Pages</strong> 按 <strong>Visit site</strong>。專案網站的網址通常是：</p>
+<p><code>https://&lt;GitHub 使用者名稱&gt;.github.io/&lt;Repository 名稱&gt;/</code></p>
 <table>
 <colgroup>
 <col style="width: 100%" />
@@ -169,10 +179,9 @@ error；如果有，請直接修正，並確認目前版本可以部署。」</p
 <p>AI Studio 完成修改後，先在右側預覽確認結果，再依照以下流程操作：</p>
 <table>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 34%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -181,18 +190,16 @@ error；如果有，請直接修正，並確認目前版本可以部署。」</p
 <th>②<br />
 確認右側預覽與主要功能</th>
 <th>③<br />
-Push changes 到 GitHub</th>
-<th>④<br />
-按 Publish → Publish App</th>
+按 Push changes / Publish to GitHub，把變更推送到 main</th>
 </tr>
 </thead>
 <tbody>
 </tbody>
-</table><p>按下 <strong>Publish App</strong> 後，Google AI Studio 會自動開始部署目前版本。部署完成後，已發布的網站會更新；使用原本的公開網址重新整理，就可以看到新版內容，不需要每次建立新網址。</p>
+</table><p>只要新 commit 成功進入 GitHub 的 <code>main</code> branch，GitHub Actions 就會自動執行 build 與部署。等待 Actions 顯示成功後，重新整理原本的 GitHub Pages 網址即可看到新版；CI/CD 與 Pages 不需要重複設定，也不需要再按 AI Studio 用來部署 Cloud Run 的 <strong>Publish App</strong>。</p>
 <table>
 <thead>
 <tr>
-<th><strong>請注意：自動部署是由 Publish App 觸發。只在 Prompt 完成修改或只 Push 到 GitHub，都不會自動更新已發布的 AI Studio 網站。每次要讓網站上線新版，都要再按一次 Publish App，並等待部署完成。</strong></th>
+<th><strong>簡單記住：AI Studio 負責修改與 Push 程式碼；GitHub Actions 偵測 main 的新 commit；GitHub Pages 自動更新網站。</strong></th>
 </tr>
 </thead>
 </table>
@@ -212,38 +219,38 @@ Push changes 到 GitHub</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Publish 失敗</td>
-<td>回到 AI Studio Prompt 輸入：「請修正目前的 build error，並確認可以部署。」修正後再重新 Publish。</td>
+<td>Push 後 Actions 沒有執行</td>
+<td>確認變更已進入 <code>main</code>，且 <code>.github/workflows/deploy-pages.yml</code> 已存在於 GitHub。</td>
 </tr>
 <tr>
-<td>網址打得開，但 AI 功能不能用</td>
-<td>檢查 Settings → Secrets；不要把 API Key 貼到 GitHub。</td>
+<td>Workflow build 失敗</td>
+<td>把 Actions 的錯誤訊息貼回 AI Studio Prompt，請它依錯誤修正並再次 Push。</td>
 </tr>
 <tr>
-<td>修改後網址內容沒變</td>
-<td>確認已同步最新版本，並重新 Publish。</td>
+<td>Pages 顯示 404 或頁面空白</td>
+<td>檢查 <strong>Settings → Pages → Source</strong> 是否為 <strong>GitHub Actions</strong>，並請 AI Studio 檢查 base path 與 build 輸出資料夾。</td>
+</tr>
+<tr>
+<td>網站能開，但 AI 功能不能用</td>
+<td>App 可能依賴後端或 Secrets，不適合純 GitHub Pages；不要把 API Key 改放前端，應改用 Cloud Run 或安全後端。</td>
+</tr>
+<tr>
+<td>Actions 成功，但內容仍是舊版</td>
+<td>確認該次 run 對應最新 commit，等待幾分鐘後強制重新整理瀏覽器。</td>
 </tr>
 </tbody></table>
 <h1>最後補充｜這種部署方式要注意什麼？</h1>
 <blockquote>
-<p><strong>•</strong> GitHub 存的是「程式碼」，不是使用者資料。</p>
-<p><strong>• 如果 App
-沒有接資料庫，使用者新增或修改的資料，重新整理或重新部署後可能不會保留。</strong></p>
-</blockquote>
-<p>• 如果需要保存資料，可以在 AI Studio Prompt 說：「請幫這個 App 加上
-Firebase Firestore，讓資料可以長期保存。」完成後要再實際測試一次。</p>
-<blockquote>
-<p><strong>•</strong> 不要把 API Key、密碼或公司機密直接寫進程式碼；請放在 AI Studio
-的 Secrets。</p>
+<p><strong>•</strong> GitHub Pages 是靜態網站託管，不會執行 AI Studio App 的 Node.js 伺服器端程式。</p>
+<p><strong>•</strong> AI Studio 的 Secrets 不會自動提供給 GitHub Pages。GitHub Actions Secret 也不能安全地變成瀏覽器端 API Key；需要金鑰的功能應透過安全後端呼叫。</p>
 <p><strong>•</strong> 網址公開後，拿到網址的人可能都能使用
 App；如果內容敏感，應另外做登入或權限控管。</p>
-<p><strong>•</strong> AI 功能可能有使用量或費用限制；正式大量使用前，先確認 Google AI
-Studio / Gemini API 的用量與計費設定。</p>
+<p><strong>•</strong> 如果 App 需要伺服器、資料庫、登入或 Gemini API 金鑰，優先使用 Cloud Run、Firebase 或其他能安全執行後端程式的服務，不要為了使用 Pages 而把機密寫進前端。</p>
 </blockquote>
 <table>
 <thead>
 <tr>
-<th>簡單記住：GitHub 用來保存程式碼版本；Secrets 用來放金鑰；要保存使用者資料，App 需要資料庫。</th>
+<th>簡單記住：CI/CD 只需設定一次；以後每次從 AI Studio Push 新 commit 到 main，GitHub Actions 就會自動更新 GitHub Pages。</th>
 </tr>
 </thead>
 </table>
@@ -252,6 +259,8 @@ Studio / Gemini API 的用量與計費設定。</p>
 apps</u></a></p>
 <p><a href="https://docs.github.com/en/get-started/onboarding/getting-started-with-your-github-account"><u>GitHub — Getting started with your
 account</u></a></p>
+<p><a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site"><u>GitHub Pages — Configuring a publishing source</u></a></p>
+<p><a href="https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages"><u>GitHub Pages — Using custom workflows</u></a></p>
 <p>文件依 2026-08-30 可取得的官方資訊製作。Google AI Studio 與 GitHub
 介面可能隨更新略有變動。</p>
   </main>
